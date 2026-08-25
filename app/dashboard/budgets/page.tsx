@@ -10,6 +10,7 @@ import {
 } from "@/lib/api/client";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { useOffline } from "@/components/offline/OfflineProvider";
+import { useToast } from "@/components/ui/use-toast";
 
 
 interface BudgetFormData {
@@ -23,6 +24,7 @@ interface BudgetFormData {
 
 export default function BudgetsPage() {
     const { isOnline, queueAction } = useOffline();
+    const { toast } = useToast();
     const [budgets, setBudgets] = useState<Budget[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,10 @@ export default function BudgetsPage() {
     const handleCreateBudget = async (budgetData: Omit<Budget, 'id' | 'createdAt' | 'updatedAt'>) => {
         if (!isOnline) {
             queueAction('CREATE_BUDGET', `Create budget: ${budgetData.name}`, budgetData);
-            alert('You are offline. Your budget has been queued and will be saved when you reconnect.');
+            toast({
+                title: "Budget Queued",
+                description: "Offline: Your budget has been queued and will be saved when you reconnect.",
+            });
             // Optimistic update
             const tempBudget: Budget = {
                 ...budgetData,
@@ -71,9 +76,18 @@ export default function BudgetsPage() {
             const newBudget = await createBudget(budgetData);
             setBudgets(prev => [...prev, newBudget]);
             setShowForm(false);
+            toast({
+                title: "Budget Created",
+                description: `Budget "${budgetData.name}" has been created successfully.`,
+            });
         } catch (err) {
             setError('Failed to create budget');
             console.error('Error creating budget:', err);
+            toast({
+                title: "Failed to Create Budget",
+                description: "An error occurred while creating the budget.",
+                variant: "destructive",
+            });
         }
     };
 
@@ -82,7 +96,10 @@ export default function BudgetsPage() {
         
         if (!isOnline) {
             queueAction('UPDATE_BUDGET', `Update budget: ${budgetData.name}`, { id: editingBudget.id, ...budgetData });
-            alert('You are offline. Your budget updates have been queued.');
+            toast({
+                title: "Budget Update Queued",
+                description: "Offline: Your budget updates have been queued and will be saved when you reconnect.",
+            });
             // Optimistic update
             setBudgets(prev => prev.map(b => b.id === editingBudget.id ? { ...b, ...budgetData } : b));
             setEditingBudget(null);
@@ -95,9 +112,18 @@ export default function BudgetsPage() {
             setBudgets(prev => prev.map(b => b.id === editingBudget.id ? updatedBudget : b));
             setEditingBudget(null);
             setShowForm(false);
+            toast({
+                title: "Budget Updated",
+                description: `Budget "${budgetData.name}" has been updated successfully.`,
+            });
         } catch (err) {
             setError('Failed to update budget');
             console.error('Error updating budget:', err);
+            toast({
+                title: "Failed to Update Budget",
+                description: "An error occurred while updating the budget.",
+                variant: "destructive",
+            });
         }
     };
 
@@ -106,7 +132,10 @@ export default function BudgetsPage() {
         
         if (!isOnline) {
             queueAction('DELETE_BUDGET', `Delete budget: ${id}`, { id });
-            alert('You are offline. Your deletion request has been queued.');
+            toast({
+                title: "Budget Deletion Queued",
+                description: "Offline: Your deletion request has been queued and will be processed when you reconnect.",
+            });
             setBudgets(prev => prev.filter(b => b.id !== id));
             return;
         }
@@ -114,9 +143,18 @@ export default function BudgetsPage() {
         try {
             await deleteBudget(id);
             setBudgets(prev => prev.filter(b => b.id !== id));
+            toast({
+                title: "Budget Deleted",
+                description: "Budget has been deleted successfully.",
+            });
         } catch (err) {
             setError('Failed to delete budget');
             console.error('Error deleting budget:', err);
+            toast({
+                title: "Failed to Delete Budget",
+                description: "An error occurred while deleting the budget.",
+                variant: "destructive",
+            });
         }
     };
 

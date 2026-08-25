@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Operation {
   id: string;
@@ -57,6 +58,7 @@ export default function TransactionDrawer({
 }: TransactionDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const { toast } = useToast();
 
   // Focus management
   useEffect(() => {
@@ -117,8 +119,10 @@ export default function TransactionDrawer({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    // In a real app, we'd show a toast here
-    alert("Copied to clipboard!");
+    toast({
+      title: "Copied to Clipboard",
+      description: "Transaction hash has been copied to your clipboard.",
+    });
   };
 
   const exportJson = () => {

@@ -130,7 +130,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setTimeout(() => {
           removeToast(newNotification.id);
-        }, 5000);
+        }, 4000);
       }
     },
     [preferences, removeToast],
