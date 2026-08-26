@@ -9,6 +9,7 @@ import {
   Budget,
 } from "@/lib/api/client";
 import BudgetForm from "@/components/budgets/BudgetForm";
+import BudgetCategoryBreakdownChart from "@/components/budgets/BudgetCategoryBreakdownChart";
 import { useOffline } from "@/components/offline/OfflineProvider";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -222,8 +223,13 @@ export default function BudgetsPage() {
             onCancel={handleCancelForm}
             initialData={editingBudget}
             isEditing={!!editingBudget}
+            budgetCount={budgets.length}
           />
         </div>
+      )}
+
+      {budgets.length > 0 && (
+        <BudgetCategoryBreakdownChart budgets={budgets} />
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

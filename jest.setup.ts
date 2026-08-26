@@ -18,6 +18,10 @@ if (typeof globalThis.TextDecoder === "undefined") {
   globalThis.TextDecoder = TextDecoder as typeof TextDecoder;
 }
 
-if (typeof globalThis.crypto === "undefined") {
-  globalThis.crypto = webcrypto as Crypto;
+if (typeof globalThis.crypto === "undefined" || !globalThis.crypto.subtle) {
+  Object.defineProperty(globalThis, "crypto", {
+    value: webcrypto,
+    configurable: true,
+    writable: true,
+  });
 }
